@@ -33,6 +33,13 @@ class ViewController: UIViewController {
     }
 
     @IBAction func save(_ sender: Any) {
+        guard let image = imageView.image else { return }
+        UIImageWriteToSavedPhotosAlbum(
+            image,
+            self,
+            #selector(image(_:didfinishSavingWithError:contextInfo:)),
+            nil
+        )
     }
 
     @IBAction func intensityChanged(_ sender: Any) {
@@ -58,6 +65,23 @@ class ViewController: UIViewController {
         picker.allowsEditing = true
         picker.delegate = self
         present(picker, animated: true)
+    }
+
+    @objc func image(_ image: UIImage, didfinishSavingWithError error: Error?, contextInfo: UnsafeRawPointer) {
+        let title: String
+        let message: String
+
+        if let error = error {
+            title = "Save error"
+            message = error.localizedDescription
+        } else {
+            title = "Saved!"
+            message = "Your altered image has been saved to your photos"
+        }
+
+        let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alertController.addAction(UIAlertAction(title: "Ok", style: .default))
+        present(alertController, animated: true)
     }
 
     func applyProcessing() {
